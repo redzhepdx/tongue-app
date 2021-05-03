@@ -1,0 +1,28 @@
+segmentation_model:
+  type: segmentation_models_pytorch.FPN
+  encoder_name: "timm-efficientnet-b3"
+  classes: 1
+  encoder_weights: "imagenet"
+
+classification_model:
+  model_name: "efficientnet_b2"
+  classes: 8
+
+class_names: ["Erythroplakia",
+              "Fissured Tongue",
+              "Geographic Tongue",
+              "Hairy Tongue",
+              "Leukoplakia",
+              "Lichen Planus",
+              "Normal Tongue",
+              "Tongue Cancer"]
+
+segmentation_model_weights: "artifacts/fpn_tongue_seg_tune.ckpt"
+classification_model_weights: "artifacts/efficient_net_b2_tongue_cl_v3_8_classes.ckpt"
+
+rules:
+  use_classification: True
+  use_segmentation: True
+  use_face_detection: True
+
+  input_type: "webcam"
