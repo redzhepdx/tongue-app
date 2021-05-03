@@ -72,7 +72,7 @@ def fill_and_close(mask: np.ndarray) -> np.ndarray:
 
     hull = cv2.convexHull(contours[0], False)
 
-    if cv2.contourArea(contours[0]) < 500:
+    if cv2.contourArea(hull) < (mask.shape[0] * mask.shape[1]) * 0.3:
         return np.full_like(mask, 255)
 
     cv2.drawContours(mask, contours[1:], 0, color=0, thickness=-1)

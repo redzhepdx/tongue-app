@@ -10,7 +10,7 @@ import yaml
 from facenet_pytorch import MTCNN
 
 from utils import create_classification_model, create_segmentation_model
-from utils import haze_removal, fill_and_close
+from utils import fill_and_close
 
 
 def get_args():
@@ -73,7 +73,7 @@ class TongueAnalysisApp(object):
         self.iface.test_launch()
 
     def launch(self):
-        self.iface.launch(share=True)
+        self.iface.launch(share=self.rules.get("share"))
 
     @torch.no_grad()
     def segment(self, image: np.ndarray) -> np.ndarray:

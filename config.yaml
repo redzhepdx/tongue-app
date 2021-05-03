@@ -26,3 +26,4 @@ rules:
   use_face_detection: True
 
   input_type: "webcam"
+  share: True

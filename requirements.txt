@@ -1,0 +1,9 @@
+albumentations==0.4.6
+torch==1.7.1
+torchvision==0.8.2
+torchcontrib==0.0.2
+facenet-pytorch==2.5.2
+pytorch-lightning==1.2.8
+timm==0.3.2
+opencv-contrib-python==4.5.1.48
+opencv-python==4.4.0.46
