@@ -25,7 +25,8 @@ class TongueAnalysisApp(object):
                  class_names: List[str] = None,
                  segmentation_threshold: float = 0.3,
                  class_count: int = 5,
-                 rules: Dict = None):
+                 rules: Dict = None,
+                 device: torch.device = None):
 
         self.segmentation_model = segmentation_model
         self.classification_model = classification_model
@@ -54,6 +55,10 @@ class TongueAnalysisApp(object):
             self.class_names = [str(i) for i in range(self.class_count)]
         else:
             self.class_names = class_names
+
+        self.device = device
+        if device is None:
+            self.device = torch.device('cpu')
 
         self.rules = rules
 
@@ -84,7 +89,7 @@ class TongueAnalysisApp(object):
 
             normalized = self.segmentation_norm(image=preprocessed)["image"]
 
-            tensor_img = torch.from_numpy(normalized).permute(2, 0, 1).unsqueeze_(0).cuda()
+            tensor_img = torch.from_numpy(normalized).permute(2, 0, 1).unsqueeze_(0).to(device=self.device)
 
             predictions = self.segmentation_model(tensor_img)
 
@@ -104,7 +109,7 @@ class TongueAnalysisApp(object):
     def classify(self, image: np.ndarray) -> Dict[str, float]:
         print("Classification")
         normalized = self.classification_preprocess(image=image)["image"]
-        tensor_img = torch.from_numpy(normalized).permute(2, 0, 1).unsqueeze_(0).cuda()
+        tensor_img = torch.from_numpy(normalized).permute(2, 0, 1).unsqueeze_(0).to(self.device)
 
         predictions = self.classification_model(tensor_img)[0].cpu().numpy()
 
@@ -154,12 +159,16 @@ def main():
     with open(args.config_path) as fp:
         h_params = yaml.load(fp, Loader=yaml.SafeLoader)
 
-    classification_model = create_classification_model(h_params=h_params["classification_model"],
-                                                       weight_path=h_params["classification_model_weights"])
-    segmentation_model = create_segmentation_model(h_params=h_params["segmentation_model"],
-                                                   weight_path=h_params["segmentation_model_weights"])
+    device = torch.device(h_params["device"])
 
-    face_detector = MTCNN(image_size=500)
+    classification_model = create_classification_model(h_params=h_params["classification_model"],
+                                                       weight_path=h_params["classification_model_weights"],
+                                                       device=device)
+    segmentation_model = create_segmentation_model(h_params=h_params["segmentation_model"],
+                                                   weight_path=h_params["segmentation_model_weights"],
+                                                   device=device)
+
+    face_detector = MTCNN(image_size=500, device=device)
 
     app = TongueAnalysisApp(segmentation_model=segmentation_model,
                             classification_model=classification_model,
@@ -167,7 +176,8 @@ def main():
                             class_names=sorted(h_params["class_names"]),
                             segmentation_threshold=0.7,
                             class_count=h_params["classification_model"]["classes"],
-                            rules=h_params["rules"])
+                            rules=h_params["rules"],
+                            device=device)
     app.setup()
     app.launch()
 

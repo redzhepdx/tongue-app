@@ -17,6 +17,8 @@ class_names: ["Erythroplakia",
               "Normal Tongue",
               "Tongue Cancer"]
 
+device: "cuda"
+
 segmentation_model_weights: "artifacts/fpn_tongue_seg_tune.ckpt"
 classification_model_weights: "artifacts/efficient_net_b2_tongue_cl_v3_8_classes.ckpt"
 

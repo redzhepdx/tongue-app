@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 
 
-def create_classification_model(h_params: Dict[str, Any], weight_path: str) -> nn.Module:
+def create_classification_model(h_params: Dict[str, Any], weight_path: str, device: torch.device) -> nn.Module:
     model = timm.create_model(model_name=h_params["model_name"],
                               num_classes=h_params["classes"],
                               pretrained=True)
@@ -21,12 +21,12 @@ def create_classification_model(h_params: Dict[str, Any], weight_path: str) -> n
 
     model = nn.Sequential(model, nn.Softmax(dim=-1))
 
-    model.to(torch.device("cuda:0"))
+    model.to(device)
 
     return model
 
 
-def create_segmentation_model(h_params: Dict[str, Any], weight_path: str) -> nn.Module:
+def create_segmentation_model(h_params: Dict[str, Any], weight_path: str, device: torch.device) -> nn.Module:
     # Create a model
     model = object_from_dict(h_params)
 
@@ -34,7 +34,7 @@ def create_segmentation_model(h_params: Dict[str, Any], weight_path: str) -> nn.
     corrections: Dict[str, str] = {"model.": ""}
     state_dict = state_dict_from_disk(file_path=weight_path, rename_in_layers=corrections)
     model.load_state_dict(state_dict)
-    model.to(torch.device("cuda:0"))
+    model.to(device)
 
     return model
 
